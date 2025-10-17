@@ -30,6 +30,41 @@ window.createModuleLoader = function(baseUrl = '') {
         (match, name) => `${match.replace('export ', '')} exports["${moduleKey}"] = exports["${moduleKey}"] || {}; exports["${moduleKey}"]["${name}"] = ${name};`);
   }
 
+  // Transform import.meta references
+  function transformImportMeta(code) {
+    // Create a mock import.meta object
+    const mockImportMeta = `
+      const importMeta = {
+        hot: {
+          dispose: function(callback) {
+            // Mock HMR dispose - in production this would be a no-op
+            if (typeof callback === 'function') {
+              // Store cleanup callback for potential future use
+              window.__hmr_cleanups = window.__hmr_cleanups || [];
+              window.__hmr_cleanups.push(callback);
+            }
+          },
+          accept: function(callback) {
+            // Mock HMR accept - in production this would be a no-op
+            console.log('HMR accept called (mocked)');
+          }
+        },
+        url: window.location.origin + '/' + moduleKey + '.js', // moduleKey is available in function scope
+        env: {
+          DEV: true,
+          PROD: false,
+          MODE: 'development'
+        }
+      };
+    `;
+
+    return code
+      // Replace import.meta with our mock object
+      .replace(/import\.meta/g, 'importMeta')
+      // Prepend the mock import.meta definition
+      .replace(/^/, mockImportMeta);
+  }
+
   // Transform imports to loadModule calls
   function transformImports(code, currentModuleKey = '') {
     return code
@@ -150,6 +185,7 @@ window.createModuleLoader = function(baseUrl = '') {
     }
 
     let code = await response.text();
+    code = transformImportMeta(code);
     code = transformExports(code, moduleKey);
     code = transformImports(code, moduleKey);
 
@@ -164,9 +200,9 @@ window.createModuleLoader = function(baseUrl = '') {
 
     try {
       if (code.includes('await ')) {
-        await new Function('loadModule', 'exports', `return (async () => { ${code} })();`)(loadModule, exports);
+        await new Function('loadModule', 'exports', 'moduleKey', `return (async () => { ${code} \n})();`)(loadModule, exports, moduleKey);
       } else {
-        new Function('loadModule', 'exports', code)(loadModule, exports);
+        new Function('loadModule', 'exports', 'moduleKey', code)(loadModule, exports, moduleKey);
       }
     } finally {
       delete exports[moduleKey]._loading;
@@ -210,6 +246,7 @@ window.createModuleLoader = function(baseUrl = '') {
         if (!response.ok) throw new Error(`Failed to fetch ${url}`);
 
         let code = await response.text();
+        code = transformImportMeta(code);
         code = transformExports(code, moduleKey);
         code = transformImports(code, moduleKey);
 
@@ -227,7 +264,8 @@ window.createModuleLoader = function(baseUrl = '') {
 
     // Process script string
     async processScript(scriptCode, moduleKey = 'main') {
-      let code = transformExports(scriptCode, moduleKey);
+      let code = transformImportMeta(scriptCode);
+      code = transformExports(code, moduleKey);
       code = transformImports(code, moduleKey);
       await executeModule(code, moduleKey);
       return exports[moduleKey] || {};
