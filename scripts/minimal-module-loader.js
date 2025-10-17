@@ -272,13 +272,13 @@ loader.processScript(script, 'myModule')
 */
 
 // this file
-// https://cdn.jsdelivr.net/gh/username/repo@latest/scripts/minimal-module-loader.js
+// https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/scripts/minimal-module-loader.js
 
 document.body.innerHTML = '';
 document.head.innerHTML = '';
 document.body.appendChild(document.createElement('div')).id = 'app';
 
-const loader = createModuleLoader('https://cdn.jsdelivr.net/gh/username/repo@latest/dist/');
-loader.loadScript('https://cdn.jsdelivr.net/gh/username/repo@latest/dist/entryPoint.js')
+const loader = createModuleLoader('https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/dist/');
+loader.loadScript('https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/dist/entryPoint.js')
 // const loader = createModuleLoader('http://localhost:4173');
 // loader.loadScript('http://localhost:4173/entryPoint.js')
