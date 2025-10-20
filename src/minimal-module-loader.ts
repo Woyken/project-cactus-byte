@@ -733,8 +733,8 @@ document.body.innerHTML = '';
 document.head.innerHTML = '';
 document.body.appendChild(document.createElement('div')).id = 'app';
 
-// const loader = window.createModuleLoader('https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/dist/');
-// loader.loadScript('https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/dist/entryPoint.js');
+const loader = window.createModuleLoader('https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/dist/');
+loader.loadScript('https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@latest/dist/entryPoint.js');
 
-const loader = window.createModuleLoader('http://localhost:3000/');
-loader.loadScript('http://localhost:3000/src/entryPoint.ts');
+// const loader = window.createModuleLoader('http://localhost:3000/');
+// loader.loadScript('http://localhost:3000/src/entryPoint.ts');
