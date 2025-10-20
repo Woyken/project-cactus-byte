@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/solid-router'
 
-import TanStackQueryHeaderUser from '../integrations/tanstack-query/header-user.tsx'
+// import TanStackQueryHeaderUser from '../integrations/tanstack-query/header-user.tsx'
 
 import { createSignal } from 'solid-js'
 import Globe from 'lucide-solid/icons/globe'
@@ -96,7 +96,7 @@ export default function Header() {
         </nav>
 
         <div class="p-4 border-t border-gray-700 bg-gray-800 flex flex-col gap-2">
-          <TanStackQueryHeaderUser />
+          {/* <TanStackQueryHeaderUser /> */}
         </div>
       </aside>
     </>

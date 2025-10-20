@@ -20,6 +20,13 @@ export default defineConfig({
     solidPlugin(),
     tailwindcss(),
     cssInjectedByJsPlugin(
+      {
+        jsAssetsFilterFunction(chunk) {
+            // no not touch module loader
+            if(chunk.name === 'minimal-module-loader') return false;
+            return chunk.isEntry
+        },
+      }
     //   {
     //   // By default this is injected on top of root module. Added queueMicrotask so that we can clear
     //   injectCodeFunction: (cssCode, { styleId, useStrictCSP, attributes }) => {
@@ -121,8 +128,17 @@ export default defineConfig({
   build: {
     assetsInlineLimit: ()=>true,
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        entryPoint: resolve(__dirname, 'src/entryPoint.ts'),
+        ['minimal-module-loader']: resolve(__dirname, 'src/minimal-module-loader.ts')
+      },
       output: {
-        entryFileNames: 'entryPoint.js',
+        entryFileNames: (chunkInfo) => {
+          if (chunkInfo.name === 'entryPoint') return 'entryPoint.js';
+          if (chunkInfo.name === 'minimal-module-loader') return 'minimal-module-loader.js';
+          return 'assets/[name]-[hash].js';
+        }
       }
     },
     modulePreload: false
