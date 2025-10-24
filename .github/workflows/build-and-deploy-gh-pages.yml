@@ -35,13 +35,31 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "TAG_MESSAGE=v$VERSION" >> $GITHUB_OUTPUT
-      - name: Deploy
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "${{ steps.package_version.outputs.VERSION }}" >/dev/null 2>&1; then
+            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.package_version.outputs.VERSION }} already exists"
+          else
+            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.package_version.outputs.VERSION }} does not exist"
+          fi
+      - name: Deploy (with new tag)
         uses: peaceiris/actions-gh-pages@v4
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && steps.check_tag.outputs.TAG_EXISTS == 'false'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           force_orphan: true
           publish_branch: gh-pages
-          tag_name: ${{ steps.package_version.outputs.VERSION }}
-          tag_message: "Deploy version ${{ steps.package_version.outputs.TAG_MESSAGE }}"
+          tag_name: ${{ steps.package_version.outputs.TAG_NAME }}
+          tag_message: "Deploy version ${{ steps.package_version.outputs.VERSION }}"
+      - name: Deploy (without tag)
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main' && steps.check_tag.outputs.TAG_EXISTS == 'true'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true
+          publish_branch: gh-pages
