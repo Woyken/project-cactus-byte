@@ -145,5 +145,6 @@ export default defineConfig({
   },
   server: {
     cors: true
-  }
+  },
+  base: './',
 })
