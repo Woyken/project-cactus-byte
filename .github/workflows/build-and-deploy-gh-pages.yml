@@ -29,6 +29,12 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm build
+      - name: Extract version from package.json
+        id: package_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG_MESSAGE=v$VERSION" >> $GITHUB_OUTPUT
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/main'
@@ -37,3 +43,5 @@ jobs:
           publish_dir: ./dist
           force_orphan: true
           publish_branch: gh-pages
+          tag_name: ${{ steps.package_version.outputs.VERSION }}
+          tag_message: "Deploy version ${{ steps.package_version.outputs.TAG_MESSAGE }}"
