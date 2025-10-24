@@ -35,6 +35,8 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "TAG_NAME=$VERSION" >> $GITHUB_OUTPUT
+      - name: Fetch all tags
+        run: git fetch --tags
       - name: Check if tag exists
         id: check_tag
         run: |
