@@ -736,8 +736,8 @@ document.body.appendChild(document.createElement('div')).id = 'app';
 import packageJson from '../package.json' with { type: "json" }
 
 
-const loader = window.createModuleLoader(`https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@${packageJson.version}/dist/`);
-loader.loadScript(`https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@${packageJson.version}/dist/entryPoint.js`);
+const loader = window.createModuleLoader(`https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@${packageJson.version}/`);
+loader.loadScript(`https://cdn.jsdelivr.net/gh/Woyken/project-cactus-byte@${packageJson.version}/entryPoint.js`);
 
 // const loader = window.createModuleLoader('http://localhost:3000/');
 // loader.loadScript('http://localhost:3000/src/entryPoint.ts');
