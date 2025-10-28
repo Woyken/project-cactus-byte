@@ -37,7 +37,7 @@ declare global {
 	}
 }
 
-window.createModuleLoader = function (baseUrl: string = ""): ModuleLoader {
+window.createModuleLoader = (baseUrl: string = ""): ModuleLoader => {
 	console.log("🏗️ DEBUG createModuleLoader called with baseUrl:", baseUrl);
 
 	const exports: ModuleCache = {};
@@ -381,7 +381,9 @@ window.createModuleLoader = function (baseUrl: string = ""): ModuleLoader {
 				for (const key in node) {
 					const value = node[key];
 					if (Array.isArray(value)) {
-						value.forEach((child) => findImports(child, depth + 1));
+						value.forEach((child) => {
+							findImports(child, depth + 1);
+						});
 					} else if (value && typeof value === "object") {
 						findImports(value, depth + 1);
 					}
@@ -907,7 +909,9 @@ Object.keys(${tempVarName}).forEach(key => {
 		clear: (): void => {
 			cache.clear();
 			processing.clear();
-			Object.keys(exports).forEach((key) => delete exports[key]);
+			Object.keys(exports).forEach((key) => {
+				delete exports[key];
+			});
 		},
 		getAllExports: (): ModuleCache => exports,
 	};
