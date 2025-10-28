@@ -5,10 +5,7 @@ interface BaseCompetitionItem {
 	id: string;
 	name: string;
 	type?: string;
-	course?: string;
-	location?: string;
 	playerCount?: number;
-	registrationStatus?: string;
 	comments?: string;
 }
 
@@ -17,6 +14,9 @@ export interface EventCompetitionItem extends BaseCompetitionItem {
 	itemType: "event";
 	/** unix ms timestamp for the event start */
 	timestamp: number;
+	course?: string;
+	location?: string;
+	registrationStatus?: string;
 }
 
 /** League / series item that contains multiple events */

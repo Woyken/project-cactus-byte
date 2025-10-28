@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/solid-router";
 import Clock from "lucide-solid/icons/clock";
 import MapPin from "lucide-solid/icons/map-pin";
+import MessageCircle from "lucide-solid/icons/message-circle";
 import Users from "lucide-solid/icons/users";
 import { For, Show } from "solid-js";
+import { Badge } from "~/components/ui/badge";
 import {
 	Table,
 	TableBody,
@@ -12,7 +14,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
-import { useCompetitionList } from "~/queries/useCompetitionList";
+import {
+	type EventCompetitionItem,
+	type LeagueCompetitionItem,
+	useCompetitionList,
+} from "~/queries/useCompetitionList";
 
 export const Route = createFileRoute("/competition-list")({
 	component: RouteComponent,
@@ -20,8 +26,8 @@ export const Route = createFileRoute("/competition-list")({
 
 function RouteComponent() {
 	const query = useCompetitionList({
-		date1: new Date().toISOString().split("T")[0],
-		date2: new Date().toISOString().split("T")[0],
+		date1: "2025-08-02",
+		date2: "2025-08-02",
 	});
 
 	return (
@@ -49,67 +55,22 @@ function RouteComponent() {
 						each={query.data?.pages.flatMap((page) => page.competitions) ?? []}
 					>
 						{(competition) => (
-							<TableRow>
-								<TableCell>
-									<div class="flex flex-col gap-1">
-										<div class="text-lg font-medium">{competition.name}</div>
-										<div class="text-sm flex gap-1 items-center">
-											<Clock />
-											<span>
-												{new Date(competition.timestamp).toLocaleString()}
-											</span>
-										</div>
-										<div class="text-sm flex gap-1 items-center">
-											<MapPin />
-											<span>{competition.course}</span>
-											<span>•</span>
-											<span>{competition.location}</span>
-										</div>
-										<div class="text-sm flex gap-1 items-center">
-											<Users />
-											<span>{competition.playerCount ?? "-"}</span>
-										</div>
-									</div>
-								</TableCell>
-								<TableCell class="text-right">
-									<MapPin />
-									{competition.location}
-								</TableCell>
-							</TableRow>
+							<Show
+								when={competition.itemType === "event"}
+								fallback={
+									<CompetitionLeagueRow
+										competition={competition as LeagueCompetitionItem}
+									/>
+								}
+							>
+								<CompetitionEventRow
+									competition={competition as EventCompetitionItem}
+								/>
+							</Show>
 						)}
 					</For>
 				</TableBody>
 			</Table>
-			<For each={query.data?.pages ?? []} fallback={<div>No competitions</div>}>
-				{(page) => (
-					<div class="mb-6">
-						<For each={page.competitions}>
-							{(competition) => (
-								<article class="border rounded p-3 mb-3">
-									<div class="flex items-start gap-4">
-										<div class="flex-1">
-											<div class="text-lg font-medium">{competition.name}</div>
-											<div class="text-sm text-muted">ID: {competition.id}</div>
-											<div class="text-sm">{competition.timestamp}</div>
-											<div class="text-sm">{competition.course}</div>
-											<div class="text-sm">{competition.location}</div>
-										</div>
-										<div class="text-right">
-											<div>{competition.playerCount ?? "-"} players</div>
-											<div class="text-sm">
-												{competition.registrationStatus}
-											</div>
-										</div>
-									</div>
-									<Show when={competition.comments}>
-										<p class="mt-2 text-sm">{competition.comments}</p>
-									</Show>
-								</article>
-							)}
-						</For>
-					</div>
-				)}
-			</For>
 
 			<div class="flex items-center gap-3 mt-4">
 				<Show
@@ -129,5 +90,72 @@ function RouteComponent() {
 				</button>
 			</div>
 		</div>
+	);
+}
+
+function CompetitionEventRow(props: { competition: EventCompetitionItem }) {
+	return (
+		<TableRow>
+			<TableCell>
+				<div class="flex flex-col gap-1">
+					<div class="text-lg font-medium">{props.competition.name}</div>
+					<div class="text-sm flex gap-1 items-center">
+						<Clock />
+						<span>
+							{new Date(props.competition.timestamp).toLocaleString()}
+						</span>
+					</div>
+					<div class="text-sm flex gap-1 items-center">
+						<MapPin />
+						<span>{props.competition.course}</span>
+						<span>•</span>
+						<span>{props.competition.location}</span>
+					</div>
+					<div class="text-sm flex gap-1 items-center">
+						<Users />
+						<span>{props.competition.playerCount ?? "-"}</span>
+					</div>
+					<div class="text-sm flex gap-1 items-center">
+						<MessageCircle />
+						<span>{props.competition.comments}</span>
+					</div>
+				</div>
+			</TableCell>
+			<TableCell class="text-right">
+				<Badge variant="warning">{props.competition.type}</Badge>
+			</TableCell>
+		</TableRow>
+	);
+}
+
+function CompetitionLeagueRow(props: { competition: LeagueCompetitionItem }) {
+	return (
+		<TableRow>
+			<TableCell>
+				<div class="flex flex-col gap-1">
+					<div class="text-lg font-medium">{props.competition.name}</div>
+					<div class="text-sm flex gap-1 items-center">
+						<Clock />
+						<span>
+							{new Date(props.competition.rangeStart).toLocaleDateString()} -{" "}
+							{new Date(props.competition.rangeEnd).toLocaleDateString()}
+						</span>
+					</div>
+					<div class="text-sm flex gap-1 items-center">
+						<Users />
+						<span>{props.competition.playerCount ?? "-"}</span>
+					</div>
+					<div class="text-sm flex gap-1 items-center">
+						<MessageCircle />
+						<span>{props.competition.comments}</span>
+					</div>
+				</div>
+			</TableCell>
+			<TableCell class="text-right">
+				<Show when={!!props.competition.type}>
+					{(type) => <Badge variant="success">{type()}</Badge>}
+				</Show>
+			</TableCell>
+		</TableRow>
 	);
 }
