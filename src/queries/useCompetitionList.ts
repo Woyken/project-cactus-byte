@@ -76,7 +76,8 @@ interface CompetitionListFilters {
 async function fetchCompetitionList(
 	filters: CompetitionListFilters = { from: 1, to: 30 },
 ): Promise<CompetitionListResponse> {
-	const params = new URLSearchParams();
+	const url = new URL("https://discgolfmetrix.com/competitions_server.php");
+	const params = url.searchParams;
 
 	// Add all filter parameters
 	if (filters.name !== undefined) params.append("name", filters.name);
@@ -118,9 +119,7 @@ async function fetchCompetitionList(
 	params.append("to", String(filters.to));
 	params.append("page", filters.page ?? "all");
 
-	const response = await fetch(
-		`https://discgolfmetrix.com/competitions_server.php?${params.toString()}`,
-	);
+	const response = await fetch(url);
 	const html = await response.text();
 
 	const parser = new DOMParser();
@@ -150,9 +149,9 @@ function parseCompetitions(doc: Document): CompetitionListItem[] {
 		const type = typeSpan?.textContent?.trim();
 
 		const metadataItems = section.querySelectorAll(".metadata-list li");
-		let timestamp: number | undefined = undefined;
-		let rangeStart: number | undefined = undefined;
-		let rangeEnd: number | undefined = undefined;
+		let timestamp: number | undefined;
+		let rangeStart: number | undefined;
+		let rangeEnd: number | undefined;
 		let itemType: "event" | "league" = "event";
 		let course: string | undefined;
 		let location: string | undefined;
@@ -211,10 +210,7 @@ function parseCompetitions(doc: Document): CompetitionListItem[] {
 				itemType,
 				rangeStart,
 				rangeEnd,
-				course,
-				location,
 				playerCount,
-				registrationStatus,
 				comments,
 			});
 		} else if (itemType === "event" && timestamp !== undefined) {
