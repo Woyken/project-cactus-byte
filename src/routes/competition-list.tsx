@@ -5,6 +5,7 @@ import MessageCircle from "lucide-solid/icons/message-circle";
 import Users from "lucide-solid/icons/users";
 import { For, Show } from "solid-js";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
 	Table,
 	TableBody,
@@ -26,8 +27,8 @@ export const Route = createFileRoute("/competition-list")({
 
 function RouteComponent() {
 	const query = useCompetitionList({
-		date1: "2025-08-02",
-		date2: "2025-08-02",
+		date1: new Date().toISOString().split("T")[0],
+		date2: new Date().toISOString().split("T")[0],
 	});
 
 	return (
@@ -80,14 +81,13 @@ function RouteComponent() {
 					<div class="text-sm">Loading more…</div>
 				</Show>
 
-				<button
-					type="button"
+				<Button
 					class="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
 					disabled={!query.hasNextPage || query.isFetchingNextPage}
 					onClick={() => query.fetchNextPage()}
 				>
 					Load more
-				</button>
+				</Button>
 			</div>
 		</div>
 	);
@@ -115,14 +115,20 @@ function CompetitionEventRow(props: { competition: EventCompetitionItem }) {
 						<Users />
 						<span>{props.competition.playerCount ?? "-"}</span>
 					</div>
-					<div class="text-sm flex gap-1 items-center">
-						<MessageCircle />
-						<span>{props.competition.comments}</span>
-					</div>
+					<Show when={props.competition.comments}>
+						{(comments) => (
+							<div class="text-sm flex gap-1 items-center">
+								<MessageCircle />
+								<span>{comments()}</span>
+							</div>
+						)}
+					</Show>
 				</div>
 			</TableCell>
 			<TableCell class="text-right">
-				<Badge variant="warning">{props.competition.type}</Badge>
+				<Show when={props.competition.type}>
+					{(type) => <Badge variant="outline">{type()}</Badge>}
+				</Show>
 			</TableCell>
 		</TableRow>
 	);
@@ -145,15 +151,19 @@ function CompetitionLeagueRow(props: { competition: LeagueCompetitionItem }) {
 						<Users />
 						<span>{props.competition.playerCount ?? "-"}</span>
 					</div>
-					<div class="text-sm flex gap-1 items-center">
-						<MessageCircle />
-						<span>{props.competition.comments}</span>
-					</div>
+					<Show when={props.competition.comments}>
+						{(comments) => (
+							<div class="text-sm flex gap-1 items-center">
+								<MessageCircle />
+								<span>{comments()}</span>
+							</div>
+						)}
+					</Show>
 				</div>
 			</TableCell>
 			<TableCell class="text-right">
-				<Show when={!!props.competition.type}>
-					{(type) => <Badge variant="success">{type()}</Badge>}
+				<Show when={props.competition.type}>
+					{(type) => <Badge variant="outline">{type()}</Badge>}
 				</Show>
 			</TableCell>
 		</TableRow>
