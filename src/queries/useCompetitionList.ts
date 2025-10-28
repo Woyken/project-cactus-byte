@@ -1,4 +1,5 @@
 import { useInfiniteQuery } from "@tanstack/solid-query";
+import type { Accessor } from "solid-js";
 
 /** Base fields common to all competition list items */
 interface BaseCompetitionItem {
@@ -257,32 +258,40 @@ function parsePagination(doc: Document): PaginationInfo {
 	};
 }
 
+type CompetitionListFiltersInput = Accessor<
+	Omit<CompetitionListFilters, "from" | "to">
+>;
+
 export function useCompetitionList(
-	filters: Omit<CompetitionListFilters, "from" | "to"> = {},
+	filtersAccessor: CompetitionListFiltersInput,
 ) {
-	return useInfiniteQuery(() => ({
-		queryKey: ["competitions", "list", filters],
-		queryFn: ({ pageParam }) =>
-			fetchCompetitionList({
-				...filters,
-				from: pageParam.from,
-				to: pageParam.to,
-			}),
-		initialPageParam: { from: 1, to: 30 },
-		getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-			if (!lastPage.pagination.hasNext) return undefined;
-			return {
-				from: lastPageParam.to + 1,
-				to: lastPageParam.to + 30,
-			};
-		},
-		getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
-			if (firstPageParam.from <= 1) return undefined;
-			return {
-				from: Math.max(1, firstPageParam.from - 30),
-				to: firstPageParam.from - 1,
-			};
-		},
-		staleTime: 1000 * 60,
-	}));
+	return useInfiniteQuery(() => {
+		const filters = filtersAccessor();
+
+		return {
+			queryKey: ["competitions", "list", filters],
+			queryFn: ({ pageParam }) =>
+				fetchCompetitionList({
+					...filters,
+					from: pageParam.from,
+					to: pageParam.to,
+				}),
+			initialPageParam: { from: 1, to: 30 },
+			getNextPageParam: (lastPage, _allPages, lastPageParam) => {
+				if (!lastPage.pagination.hasNext) return undefined;
+				return {
+					from: lastPageParam.to + 1,
+					to: lastPageParam.to + 30,
+				};
+			},
+			getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => {
+				if (firstPageParam.from <= 1) return undefined;
+				return {
+					from: Math.max(1, firstPageParam.from - 30),
+					to: firstPageParam.from - 1,
+				};
+			},
+			staleTime: 1000 * 60,
+		};
+	});
 }
