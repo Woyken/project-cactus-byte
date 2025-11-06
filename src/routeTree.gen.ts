@@ -13,6 +13,7 @@ import { Route as CompetitionListRouteImport } from './routes/competition-list'
 import { Route as AnotherDemoPageRouteImport } from './routes/another-demo-page'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo.tanstack-query'
+import { Route as CompetitionCompetitionIdRouteImport } from './routes/competition.$competitionId'
 
 const CompetitionListRoute = CompetitionListRouteImport.update({
   id: '/competition-list',
@@ -34,17 +35,25 @@ const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   path: '/demo/tanstack-query',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompetitionCompetitionIdRoute =
+  CompetitionCompetitionIdRouteImport.update({
+    id: '/competition/$competitionId',
+    path: '/competition/$competitionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/another-demo-page': typeof AnotherDemoPageRoute
   '/competition-list': typeof CompetitionListRoute
+  '/competition/$competitionId': typeof CompetitionCompetitionIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/another-demo-page': typeof AnotherDemoPageRoute
   '/competition-list': typeof CompetitionListRoute
+  '/competition/$competitionId': typeof CompetitionCompetitionIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 export interface FileRoutesById {
@@ -52,6 +61,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/another-demo-page': typeof AnotherDemoPageRoute
   '/competition-list': typeof CompetitionListRoute
+  '/competition/$competitionId': typeof CompetitionCompetitionIdRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 export interface FileRouteTypes {
@@ -60,14 +70,21 @@ export interface FileRouteTypes {
     | '/'
     | '/another-demo-page'
     | '/competition-list'
+    | '/competition/$competitionId'
     | '/demo/tanstack-query'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/another-demo-page' | '/competition-list' | '/demo/tanstack-query'
+  to:
+    | '/'
+    | '/another-demo-page'
+    | '/competition-list'
+    | '/competition/$competitionId'
+    | '/demo/tanstack-query'
   id:
     | '__root__'
     | '/'
     | '/another-demo-page'
     | '/competition-list'
+    | '/competition/$competitionId'
     | '/demo/tanstack-query'
   fileRoutesById: FileRoutesById
 }
@@ -75,6 +92,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnotherDemoPageRoute: typeof AnotherDemoPageRoute
   CompetitionListRoute: typeof CompetitionListRoute
+  CompetitionCompetitionIdRoute: typeof CompetitionCompetitionIdRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
 }
 
@@ -108,6 +126,13 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof DemoTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/competition/$competitionId': {
+      id: '/competition/$competitionId'
+      path: '/competition/$competitionId'
+      fullPath: '/competition/$competitionId'
+      preLoaderRoute: typeof CompetitionCompetitionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -115,6 +140,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnotherDemoPageRoute: AnotherDemoPageRoute,
   CompetitionListRoute: CompetitionListRoute,
+  CompetitionCompetitionIdRoute: CompetitionCompetitionIdRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
 }
 export const routeTree = rootRouteImport

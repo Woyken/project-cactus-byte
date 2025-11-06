@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/solid-router";
+import { createFileRoute, Link } from "@tanstack/solid-router";
 import Clock from "lucide-solid/icons/clock";
 import MapPin from "lucide-solid/icons/map-pin";
 import MessageCircle from "lucide-solid/icons/message-circle";
@@ -372,11 +372,25 @@ function RouteComponent() {
 }
 
 function CompetitionEventRow(props: { competition: EventCompetitionItem }) {
+	const canNavigate = /^[0-9]+$/.test(props.competition.id);
+
 	return (
 		<TableRow>
 			<TableCell>
 				<div class="flex flex-col gap-1">
-					<div class="text-lg font-medium">{props.competition.name}</div>
+					<div class="text-lg font-medium">
+						{canNavigate ? (
+							<Link
+								to="/competition/$competitionId"
+								params={{ competitionId: props.competition.id }}
+								class="text-primary hover:underline"
+							>
+								{props.competition.name}
+							</Link>
+						) : (
+							props.competition.name
+						)}
+					</div>
 					<div class="text-sm flex gap-1 items-center">
 						<Clock />
 						<span>
@@ -385,9 +399,11 @@ function CompetitionEventRow(props: { competition: EventCompetitionItem }) {
 					</div>
 					<div class="text-sm flex gap-1 items-center">
 						<MapPin />
-						<span>{props.competition.course}</span>
-						<span>•</span>
-						<span>{props.competition.location}</span>
+						<span>{props.competition.course ?? "-"}</span>
+						<Show when={props.competition.course && props.competition.location}>
+							<span>•</span>
+						</Show>
+						<span>{props.competition.location ?? "-"}</span>
 					</div>
 					<div class="text-sm flex gap-1 items-center">
 						<Users />
