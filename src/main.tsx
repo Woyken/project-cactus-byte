@@ -2,15 +2,18 @@ import { RouterProvider, createRouter } from "@tanstack/solid-router";
 import { render } from "solid-js/web";
 
 import { routeTree } from "./routeTree.gen";
-import { createSearchParamHistory } from "./lib/routerSearchParamHistory";
 import "./styles.css";
+
+const history = location.hostname === "discgolfmetrix.com"
+  ? await import("./lib/routerSearchParamHistory").then(x=>x.createSearchParamHistory({ searchParamUrlName: "path" }))
+  : undefined;
 
 const router = createRouter({
   routeTree,
   // defaultPreload: "intent",
   // scrollRestoration: true,
   // defaultPreloadStaleTime: 0,
-  history: createSearchParamHistory({ searchParamUrlName: "path" }),
+  history: history,
 });
 
 declare module "@tanstack/solid-router" {
