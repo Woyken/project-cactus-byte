@@ -1,56 +1,38 @@
 import {
-  HeadContent,
-  Outlet,
-  Scripts,
-  createRootRouteWithContext,
-} from '@tanstack/solid-router'
-// import { lazy } from 'solid-js'
-// import { createSignal, onMount } from 'solid-js'
+	createRootRouteWithContext,
+	HeadContent,
+	Outlet,
+	Scripts,
+} from "@tanstack/solid-router";
 
-// React query dev tools generate some weird css with goober, it contains not classnames but keyframes
-// const TanStackRouterDevtools = lazy(() =>
-//   import('@tanstack/solid-router-devtools').then(module => ({
-//     default: module.TanStackRouterDevtools
-//   }))
-// )
-import TanStackQueryProvider from '../integrations/tanstack-query/provider.tsx'
+import { TanStackRouterDevtools } from "@tanstack/solid-router-devtools";
+import TanStackQueryProvider from "../integrations/tanstack-query/provider.tsx";
+import "@fontsource/inter";
 
-import '@fontsource/inter'
-
-import Header from '../components/Header'
-
-// import styleCss from '../styles.css?url'
+import { SolidQueryDevtools } from "@tanstack/solid-query-devtools";
+import Header from "../components/Header";
 
 export const Route = createRootRouteWithContext()({
-  head: () => ({
-    // links: [{ rel: 'stylesheet', href: styleCss }],
-  }),
-  shellComponent: RootComponent,
-})
+	head: () => ({
+		// links: [{ rel: 'stylesheet', href: styleCss }],
+	}),
+	shellComponent: RootComponent,
+});
 
 function RootComponent() {
-  // const [showDevtools, setShowDevtools] = createSignal(false)
+	return (
+		<>
+			<TanStackQueryProvider>
+				<HeadContent />
 
-  // onMount(() => {
-  //   const timer = setTimeout(() => {
-  //     setShowDevtools(true)
-  //   }, 10000) // 10 seconds
+				<Header />
 
-  //   return () => clearTimeout(timer)
-  // })
+				<Outlet />
+				<TanStackRouterDevtools />
+				<SolidQueryDevtools />
+			</TanStackQueryProvider>
 
-  return (
-    <>
-      <TanStackQueryProvider>
-        <HeadContent />
-
-        <Header />
-
-        <Outlet />
-        {/* {showDevtools() && <TanStackRouterDevtools />} */}
-      </TanStackQueryProvider>
-
-      <Scripts />
-    </>
-  )
+			<Scripts />
+		</>
+	);
 }
